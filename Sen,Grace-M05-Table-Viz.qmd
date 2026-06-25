@@ -1,0 +1,124 @@
+---
+title: "M05-Visualizing Data with Tables"
+author: "Grace Sen"
+date: today
+format: 
+  html: 
+    toc: true
+    number-sections: true
+    code-link: true
+    embed-resources: true
+editor: visual
+execute: 
+  freeze: auto
+---
+
+# Short essay
+
+## What I Learned
+
+> Summarize what you learned from the videos you watched.
+
+I learned that the **`gt`** package makes it easy to create clean and professional tables in R. Before watching the videos, I didn't realize tables could be customized as much as charts.
+
+The **`gtExtras`** package was especially interesting because it adds small charts and other visual features directly into tables. Overall, I think these packages make reports look more organized and easier to read.
+
+## What I Liked About gt and gtExtras
+
+> What did you like about the *gt* and *gtExtra* packages demonstrated in the videos?
+
+I liked how easy it is to customize tables with titles, colors, labels, and formatting. The small charts created with **`gtExtras`** make it easier to compare values without creating separate graphs. This would save a lot of time when preparing reports or presentations.
+
+## Tables vs. Charts
+
+> How do tables complement charts for data visualization?
+
+Charts help readers quickly see patterns and trends, while tables provide the exact values behind the data. Using both together makes it easier to understand the results and communicate them clearly. I think combining tables and charts makes a report more complete.
+
+## When I Would Use Tables
+
+> Under what circumstances would you prefer to use tables rather than charts to visualize data?
+
+I would use tables when readers need to see exact numbers instead of general trends.
+
+::: callout-tip
+## Example
+
+Tables are useful when comparing values across different groups or when presenting summary statistics.
+:::
+
+Charts are better for showing patterns, but tables are better when precision is important. In a business report, I would probably include both to give readers a complete picture.
+
+# Descriptive Statistics Table
+
+```{r}
+#| include: false
+#| results: hide
+
+# install.packages("gt")
+# install.packages("gtExtras")
+library(tidyverse)
+library(gt)
+library(gtExtras)
+library(scales)
+library(dplyr)
+```
+
+```{r}
+
+summary_tbl <- mtcars |>
+  group_by(cyl) |>
+  summarise(
+    Cars = n(),
+    `Average MPG` = mean(mpg),
+    `Average HP` = mean(hp),
+    `Average Weight` = mean(wt),
+    MPG = list(mpg)
+  )
+summary_tbl
+```
+
+```{r}
+#| warning: false
+summary_tbl |>
+  gt(rowname_col = "cyl") |>
+  tab_header(
+    title = md("**Summary Statistics of the mtcars Dataset by Cylinders**"),
+    subtitle = "Descriptive statistics from the mtcars dataset"
+  ) |>
+  tab_stubhead(label = "Cylinders") |>
+  tab_spanner(
+    label = "Vehicle Statistics",
+    columns = c(`Average MPG`, `Average HP`, `Average Weight`)
+  ) |>
+  fmt_number(
+    columns = c(`Average MPG`, `Average HP`, `Average Weight`),
+    decimals = 2
+  ) |>
+  data_color(
+    columns = `Average MPG`,
+    colors = scales::col_numeric(
+      palette = c("#fee8c8", "#e34a33"),
+      domain = NULL
+    )
+  ) |>
+  tab_footnote(
+    footnote = "Values are grouped by the number of cylinders.",
+    locations = cells_column_labels(`Average MPG`)
+  ) |>
+  gt_plt_dist(
+    column = MPG
+  ) |>
+  cols_label(
+    MPG = "MPG Distribution"
+  ) |>
+  tab_source_note(
+    source_note = "Built-in mtcars dataset in R"
+  )
+```
+
+# Why This Table Is Useful
+
+This table summarizes the data in a clear and organized format. It combines exact values with a small distribution plot, making it easier to compare different cylinder groups. I would include a table like this in my MSDM project because it helps readers quickly compare groups while still providing detailed information.
+
+# Publish the qmd file to GitHub
